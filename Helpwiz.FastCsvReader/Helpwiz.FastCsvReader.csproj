@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <Description>A fast csv reader that compiles expressions for the properties of the target type, and sets the data directly using these. Allows for quoted comma-containing values e.g. "A value, and another". Does not allow multi-line cells. Does not allow escaped quotes in cell values.</Description>
+    <Copyright>Helpwiz Ltd. 2020.</Copyright>
+    <PackageLicenseFile>License.txt</PackageLicenseFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="License.txt">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
+
+</Project>

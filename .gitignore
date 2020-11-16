@@ -1,0 +1,14 @@
+.exe.config
+bin/
+obj/
+packages/
+ConnectionStrings.config
+privateSettings.config
+*/obj/
+*.mdf
+*.ldf
+node_modules/
+.vs/
+*.bin
+*.zip
+*.exe.config
