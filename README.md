@@ -93,4 +93,4 @@ and extend to other datatypes as follows:
 in a simple, one-pass process. We have cleaners in many locations throughout the UK.
 
 We provide this code for free, without any license contraints, but we do hope that, if you make use of the code, you will
-link back to us.
+link back to us or otherwise give us a shout out.
