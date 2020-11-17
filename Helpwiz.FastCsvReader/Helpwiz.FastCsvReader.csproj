@@ -6,6 +6,8 @@
     <Copyright>Helpwiz Ltd. 2020.</Copyright>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.1</Version>
+    <PackageReleaseNotes>Added multi-attribute reading, to allow multiple field names to map to a single property.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

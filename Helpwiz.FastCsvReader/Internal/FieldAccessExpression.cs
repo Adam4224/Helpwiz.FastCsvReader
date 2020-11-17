@@ -15,16 +15,15 @@ namespace Helpwiz.FastCsvReader.Internal
         private static Dictionary<string, PropertyInfo> GetProperties()
         {
             var props = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public | BindingFlags.FlattenHierarchy)
-                .Where(t => CustomAttributeExtensions.GetCustomAttribute<CsvIgnoreAttribute>((MemberInfo) t) == null)
+                .Where(t => t.GetCustomAttribute<CsvIgnoreAttribute>() == null)
                 .Concat(typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.FlattenHierarchy)
                     .Where(t => t.GetCustomAttribute<CsvPropertyAttribute>() != null))
                 .Where(t => t.CanWrite)
                 .ToArray();
             var ret = new Dictionary<string, PropertyInfo>();
-            foreach (var prop in props.Where(t => t.GetCustomAttribute<CsvPropertyAttribute>() != null))
+            foreach (var prop in props.Where(t => t.GetCustomAttributes<CsvPropertyAttribute>().Any()))
             {
-                var attribute = prop.GetCustomAttribute<CsvPropertyAttribute>();
-                if (attribute != null)
+                foreach (var attribute in prop.GetCustomAttributes<CsvPropertyAttribute>())
                 {
                     if (attribute.PropertyName == null)
                     {
@@ -39,7 +38,7 @@ namespace Helpwiz.FastCsvReader.Internal
                 }
             }
 
-            foreach (var prop in props.Where(t => t.GetCustomAttribute<CsvPropertyAttribute>() == null))
+            foreach (var prop in props.Where(t => !t.GetCustomAttributes<CsvPropertyAttribute>().Any()))
             {
                 CheckName(ret, prop.Name);
                 ret[prop.Name] = prop;

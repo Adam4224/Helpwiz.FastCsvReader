@@ -28,6 +28,12 @@ namespace Helpwiz.FastCsvReader.Tests
             "¬Part-Time¬¬",
         };
 
+        private readonly string[] testData4 =
+        {
+            "Code2,Name1,Notes",
+            "AAA,BBB,CCC"
+        };
+
         [SetUp]
         public void Setup()
         {
@@ -112,6 +118,29 @@ namespace Helpwiz.FastCsvReader.Tests
             Assert.That(result[2].Area, Is.Null);
             Assert.That(result[2].QuotaValuesAndResults, Is.Not.Null.Or.Empty);
             Assert.That(result[3].Area, Is.Null);
+        }
+
+        [Test]
+        public void TestMultiAttribute()
+        {
+            var result = FastCsvReader.ReadAs<MultiAttr>(testData4).ToArray();
+            Assert.That(result.Length, Is.EqualTo(1));
+            Assert.That(result[0].Code, Is.EqualTo("AAA"));
+            Assert.That(result[0].Name, Is.EqualTo("BBB"));
+            Assert.That(result[0].Notes, Is.EqualTo("CCC"));
+        }
+
+        public class MultiAttr
+        {
+            [CsvProperty("Code1")]
+            [CsvProperty("Code2")]
+            [CsvProperty("Code3")]
+            public string Code { get; set; }
+
+            [CsvProperty("Name1")]
+            public string Name { get; set; }
+
+            public string Notes { get; set; }
         }
 
         public class DefaultData2
