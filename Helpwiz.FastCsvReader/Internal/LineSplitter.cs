@@ -17,10 +17,11 @@ namespace Helpwiz.FastCsvReader.Internal
             var charLists = new List<char[]>();
             var current = new List<char>();
             var quoteOpen = false;
+            char symmetricQuote = (char)0;
             var quotes = lineInput.Any(t => t == '\"' || t == '\'');
             foreach (var ch in lineInput)
             {
-                var matchesQuote = quotes && (ch == '\'' || ch == '\"');
+                var matchesQuote = quotes && ((!quoteOpen && (ch == '\'' || ch == '\"')) || (quoteOpen && ch == symmetricQuote));
                 if (ch == separator && (!quotes || !quoteOpen))
                 {
                     charLists.Add(current.ToArray());
@@ -32,11 +33,12 @@ namespace Helpwiz.FastCsvReader.Internal
                     {
                         current.Add(ch);
                     }
-                    else if (quotes && !quoteOpen)
+                    else if (!quoteOpen)
                     {
                         quoteOpen = true;
+                        symmetricQuote = ch;
                     }
-                    else if (quotes && quoteOpen)
+                    else
                     {
                         quoteOpen = false;
                     }

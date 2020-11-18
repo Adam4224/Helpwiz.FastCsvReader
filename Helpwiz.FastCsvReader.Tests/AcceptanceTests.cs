@@ -34,6 +34,13 @@ namespace Helpwiz.FastCsvReader.Tests
             "AAA,BBB,CCC"
         };
 
+        private readonly string[] testData5 =
+        {
+            "BUA13CD,BUA13NM",
+            "E34005173,\"Hart's Lane, nr Langham (Colchester) BUA\"",
+            "E34005174,\'My heart says \"I am a heart!\"\'"
+        };
+
         [SetUp]
         public void Setup()
         {
@@ -130,6 +137,21 @@ namespace Helpwiz.FastCsvReader.Tests
             Assert.That(result[0].Notes, Is.EqualTo("CCC"));
         }
 
+        [Test]
+        public void TestMixedQuotesDoesntThrow()
+        {
+            Assert.That(() => FastCsvReader.ReadAs<BuaData>(testData5).ToArray(), Throws.Nothing);
+        }
+
+        [Test]
+        public void TestMixedQuotesProducesExpectedResult()
+        {
+            var result = FastCsvReader.ReadAs<BuaData>(testData5).ToArray();
+            Assert.That(result.Length, Is.EqualTo(2));
+            Assert.That(result[0].Name, Is.EqualTo("Hart's Lane, nr Langham (Colchester) BUA"));
+            Assert.That(result[1].Name, Is.EqualTo("My heart says \"I am a heart!\""));
+        }
+
         public class MultiAttr
         {
             [CsvProperty("Code1")]
@@ -164,6 +186,15 @@ namespace Helpwiz.FastCsvReader.Tests
             public string Remarks { get; set; }
 
             public string Notes { get; set; }
+        }
+
+        private class BuaData
+        {
+            [CsvProperty("BUA13CD")]
+            public string Code { get; set; }
+
+            [CsvProperty("BUA13NM")]
+            public string Name { get; set; }
         }
     }
 }

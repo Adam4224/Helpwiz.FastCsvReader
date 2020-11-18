@@ -18,7 +18,11 @@ namespace Helpwiz.FastCsvReader.Internal
         }
 
         public T Read(string[] line, Func<T> createFunc)
-        { 
+        {
+            if (line.Length > fields.Length)
+            {
+                throw new InvalidOperationException($"Line is longer than header: {string.Join(",", line)}");
+            }
             var ret = createFunc();
             for (var i = 0; i < line.Length; i++)
             {

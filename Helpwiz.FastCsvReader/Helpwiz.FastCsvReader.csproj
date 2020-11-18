@@ -6,8 +6,8 @@
     <Copyright>Helpwiz Ltd. 2020.</Copyright>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
-    <PackageReleaseNotes>Added multi-attribute reading, to allow multiple field names to map to a single property.</PackageReleaseNotes>
+    <Version>1.0.2</Version>
+    <PackageReleaseNotes>Added handling for nested quotes of different types (e.g. "This is my son's quote", or 'This is "direct speech"')</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
