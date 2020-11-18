@@ -4,11 +4,12 @@ A fast compiled expression based csv reader.
 # Capabilities
 Allows custom delimiter characters.
 Allows quoted values with commas inside e.g. "My value, my second value and my third value"
+Allows double escaped quotes e.g. "And his heart sang, like a bird: ""I love you!"""
+Allows backslash escaped quotes e.g. "And his heart sang, like a bird: \"I love you!\""
 
 # Limitations
 Does not allow multi-line values
-Does not allow values containing quotes (i.e. no escaped quotes).
-Requires a header row for the csv file.
+Requires a header row (but this can be read from a separate file or synthesised if required).
 
 # Performance
 Because the property access expressions are compiled, the library will load csv files at the maximum speed possible.
