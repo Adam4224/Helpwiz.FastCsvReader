@@ -34,11 +34,34 @@ namespace Helpwiz.FastCsvReader.Tests
             "AAA,BBB,CCC"
         };
 
-        private readonly string[] testData5 =
+        private readonly string[] escapedDoubleQuotes =
+        {
+            "BUA13CD,BUA13NM",
+            "E34005174,\"My heart says \"\"I am a heart!\"\"\"",
+        };
+
+        private readonly string[] unquotedEscapedDoubleQuotes =
+        {
+            "BUA13CD,BUA13NM",
+            "E34005174,My heart says \"\"\"\" \"\"I am a heart!\"\"",
+        };
+
+        private readonly string[] singleQuotes =
         {
             "BUA13CD,BUA13NM",
             "E34005173,\"Hart's Lane, nr Langham (Colchester) BUA\"",
-            "E34005174,\'My heart says \"I am a heart!\"\'"
+        };
+
+        private readonly string[] backslashEscapedQuotes =
+        {
+            "BUA13CD,BUA13NM",
+            "E34005174,\"My heart says \\\"I am a heart!\\\""
+        };
+
+        private readonly string[] emptyQuotedCell =
+        {
+            "BUA13CD,BUA13NM",
+            "\"\",\"Value\""
         };
 
         [SetUp]
@@ -140,16 +163,45 @@ namespace Helpwiz.FastCsvReader.Tests
         [Test]
         public void TestMixedQuotesDoesntThrow()
         {
-            Assert.That(() => FastCsvReader.ReadAs<BuaData>(testData5).ToArray(), Throws.Nothing);
+            Assert.That(() => FastCsvReader.ReadAs<BuaData>(escapedDoubleQuotes).ToArray(), Throws.Nothing);
         }
 
         [Test]
-        public void TestMixedQuotesProducesExpectedResult()
+        public void TestSingleQuotes()
         {
-            var result = FastCsvReader.ReadAs<BuaData>(testData5).ToArray();
-            Assert.That(result.Length, Is.EqualTo(2));
+            var result = FastCsvReader.ReadAs<BuaData>(singleQuotes).ToArray();
+            Assert.That(result.Length, Is.EqualTo(1));
             Assert.That(result[0].Name, Is.EqualTo("Hart's Lane, nr Langham (Colchester) BUA"));
-            Assert.That(result[1].Name, Is.EqualTo("My heart says \"I am a heart!\""));
+            
+        }
+
+        [Test]
+        public void TestDoubleEscapedQuotes()
+        {
+            var result = FastCsvReader.ReadAs<BuaData>(escapedDoubleQuotes).ToArray();
+            Assert.That(result[0].Name, Is.EqualTo("My heart says \"I am a heart!\""));
+        }
+
+        [Test]
+        public void TestUnquotedDoubleEscapedQuotes()
+        {
+            var result = FastCsvReader.ReadAs<BuaData>(unquotedEscapedDoubleQuotes).ToArray();
+            Assert.That(result[0].Name, Is.EqualTo("My heart says \"\" \"I am a heart!\""));
+        }
+
+        [Test]
+        public void TestBackslashEscapedQuotes()
+        {
+            var result = FastCsvReader.ReadAs<BuaData>(backslashEscapedQuotes).ToArray();
+            Assert.That(result[0].Name, Is.EqualTo("My heart says \"I am a heart!\""));
+        }
+
+        [Test]
+        public void TestEmptyQuotedCell()
+        {
+            var result = FastCsvReader.ReadAs<BuaData>(emptyQuotedCell).ToArray();
+            Assert.That(result[0].Code, Is.EqualTo(string.Empty));
+            Assert.That(result[0].Name, Is.EqualTo("Value"));
         }
 
         public class MultiAttr

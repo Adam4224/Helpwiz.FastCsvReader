@@ -55,7 +55,7 @@ namespace Helpwiz.FastCsvReader
         {
             if (lineAccessDictionary.TryGetValue(typeof(T), out var ret)) return (LineAccess<T>)ret;
             var first = FirstLine;
-            var headerSplit = splitter.Split(firstLine).Select(t => t.Trim()).ToArray();
+            var headerSplit = splitter.Split(firstLine, new List<char[]>(), new List<char>()).Select(t => t.Trim()).ToArray();
             var access = new LineAccess<T>(headerSplit, converter);
             lineAccessDictionary.Add(typeof(T), access);
             return access;
@@ -103,10 +103,15 @@ namespace Helpwiz.FastCsvReader
             var access = GetLineAccess<T>();
             if (access == null) yield break;
 
+            var charLists = new List<char[]>();
+            var current = new List<char>();
+
             while (enumerator.MoveNext())
             {
-                var split = splitter.Split(enumerator.Current);
+                var split = splitter.Split(enumerator.Current, charLists, current);
                 if (!access.CanRead(split)) continue;
+                charLists.Clear();
+                current.Clear();
                 
                 yield return access.Read(split, creationFunc);
             }

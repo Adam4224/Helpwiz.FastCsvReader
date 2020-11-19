@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <Description>A fast csv reader that compiles expressions for the properties of the target type, and sets the data directly using these. Allows for quoted comma-containing values e.g. "A value, and another". Does not allow multi-line cells. Does not allow escaped quotes in cell values.</Description>
+    <Description>A fast csv reader that compiles expressions for the properties of the target type, and sets the data directly using these. Allows for quoted comma-containing values e.g. "A value, and another". Does not allow multi-line cells. Allows for escaped quotes both with \" and "".</Description>
     <Copyright>Helpwiz Ltd. 2020.</Copyright>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.2</Version>
-    <PackageReleaseNotes>Added handling for nested quotes of different types (e.g. "This is my son's quote", or 'This is "direct speech"')</PackageReleaseNotes>
+    <Version>1.0.4</Version>
+    <PackageReleaseNotes>Fixed issue with empty quoted cells. ,"", is now interpreted correctly, whereas before it would regard it as a single quote.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

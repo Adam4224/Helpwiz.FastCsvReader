@@ -12,35 +12,60 @@ namespace Helpwiz.FastCsvReader.Internal
             this.separator = separator;
         }
 
-        public string[] Split(string lineInput)
+        public string[] Split(string lineInput, List<char[]> charLists, List<char> current)
         {
-            var charLists = new List<char[]>();
-            var current = new List<char>();
             var quoteOpen = false;
-            char symmetricQuote = (char)0;
-            var quotes = lineInput.Any(t => t == '\"' || t == '\'');
+            var countBetweenQuotes = int.MinValue;
+            var lastCh = (char) 0;
             foreach (var ch in lineInput)
             {
-                var matchesQuote = quotes && ((!quoteOpen && (ch == '\'' || ch == '\"')) || (quoteOpen && ch == symmetricQuote));
-                if (ch == separator && (!quotes || !quoteOpen))
+                var matchesQuote = ch == '\"';
+                if (ch == separator && !quoteOpen)
                 {
                     charLists.Add(current.ToArray());
                     current.Clear();
+                    lastCh = (char) 0;
+                    countBetweenQuotes = int.MinValue;
                 }
                 else
                 {
                     if (!matchesQuote)
                     {
                         current.Add(ch);
+                        lastCh = ch;
+                        countBetweenQuotes++;
+                    }
+                    //Allow \" as a quote character.
+                    else if (lastCh == '\\')
+                    {
+                        current[current.Count - 1] = ch;
                     }
                     else if (!quoteOpen)
                     {
-                        quoteOpen = true;
-                        symmetricQuote = ch;
+                        if (countBetweenQuotes == 0)
+                        {
+                            current.Add('\"');
+                            countBetweenQuotes = int.MinValue;
+                        }
+                        else
+                        {
+                            quoteOpen = true;
+                            countBetweenQuotes = 0;
+                        }
                     }
                     else
                     {
-                        quoteOpen = false;
+                        //Allow "" as a " character, but prevent ,"", from being interpreted as ,",...
+                        if (countBetweenQuotes == 0 && current.Count > 0)
+                        {
+                            current.Add('\"');
+                            countBetweenQuotes = int.MinValue;
+                        }
+                        else
+                        {
+                            quoteOpen = false;
+                            countBetweenQuotes = 0;
+                        }
                     }
                 }
             }
