@@ -6,8 +6,8 @@
     <Copyright>Helpwiz Ltd. 2020.</Copyright>
     <PackageLicenseFile>License.txt</PackageLicenseFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.4</Version>
-    <PackageReleaseNotes>Fixed issue with empty quoted cells. ,"", is now interpreted correctly, whereas before it would regard it as a single quote.</PackageReleaseNotes>
+    <Version>1.0.5</Version>
+    <PackageReleaseNotes>Added IAdditionalColumns interface to allow data not directly modeled by properties or attributes to be loaded as strings.</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

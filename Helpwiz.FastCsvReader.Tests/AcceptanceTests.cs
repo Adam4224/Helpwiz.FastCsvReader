@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
@@ -161,6 +162,19 @@ namespace Helpwiz.FastCsvReader.Tests
         }
 
         [Test]
+        public void TestAdditionalColumns()
+        {
+            var result = FastCsvReader.ReadAs<AdditionalColumnsData>(testData4).ToArray();
+            Assert.That(result.Length, Is.EqualTo(1));
+            Assert.That(result[0].Code, Is.EqualTo("AAA"));
+            Assert.That(result[0].Columns.Keys.Count, Is.EqualTo(2));
+            Assert.That(result[0].Columns.ContainsKey("Name1"), Is.EqualTo(true));
+            Assert.That(result[0].Columns.ContainsKey("Notes"), Is.EqualTo(true));
+            Assert.That(result[0].Columns["Name1"], Is.EqualTo("BBB"));
+            Assert.That(result[0].Columns["Notes"], Is.EqualTo("CCC"));
+        }
+
+        [Test]
         public void TestMixedQuotesDoesntThrow()
         {
             Assert.That(() => FastCsvReader.ReadAs<BuaData>(escapedDoubleQuotes).ToArray(), Throws.Nothing);
@@ -227,6 +241,21 @@ namespace Helpwiz.FastCsvReader.Tests
             public string Remarks { get; set; }
 
             public string Notes { get; set; }
+        }
+
+        public class AdditionalColumnsData : IAdditionalColumns
+        {
+            public readonly Dictionary<string, string> Columns = new Dictionary<string, string>();
+
+            [CsvProperty("Code1")]
+            [CsvProperty("Code2")]
+            [CsvProperty("Code3")]
+            public string Code { get; set; }
+
+            public void WriteColumn(string header, string value)
+            {
+                Columns.Add(header, value);
+            }
         }
 
         private class DefaultData

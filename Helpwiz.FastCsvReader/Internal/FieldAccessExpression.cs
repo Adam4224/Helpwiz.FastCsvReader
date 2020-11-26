@@ -62,6 +62,13 @@ namespace Helpwiz.FastCsvReader.Internal
             typeProperties.Value.TryGetValue(name, out var member);
             if (member == null)
             {
+                if (typeof(IAdditionalColumns).IsAssignableFrom(typeof(T)))
+                {
+                    var type = typeof(AdditionalColumnsAccessExpression<>);
+                    var genericAccess = type.MakeGenericType(typeof(T));
+                    var instance = (FieldAccessExpression<T>) Activator.CreateInstance(genericAccess, name);
+                    return instance;
+                }
                 return empty;
             }
 
