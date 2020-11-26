@@ -89,6 +89,22 @@ and extend to other datatypes as follows:
   var result = FastCsvReader.ReadAs<DefaultData2>(testData3, '¬', converter).ToArray();
 ```
 
+## Additional Data
+You can also load raw strings into your objects by implementing IAdditionalData on your object e.g.
+
+```
+private class TargetType : IAdditionalData
+{
+  //Data from "A" column loads here.
+  public string A { get; set; }
+  
+  //Additional data loads here (all columns except A)
+  public void WriteColumn(string header, string value)
+  {
+    //...
+  }
+}
+
 ## Helpwiz
 [Helpwiz](https://helpwiz.com) is an online marketplace for independent domestic cleaners. We allow clients to find a cleaner and book a clean 
 in a simple, one-pass process. We have cleaners in many locations throughout the UK.
