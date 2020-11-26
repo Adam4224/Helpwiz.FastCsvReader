@@ -90,10 +90,10 @@ and extend to other datatypes as follows:
 ```
 
 ## Additional Data
-You can also load raw strings into your objects by implementing IAdditionalData on your object e.g.
+You can also load raw strings into your objects by implementing IAdditionalColumns on your object e.g.
 
 ```
-private class TargetType : IAdditionalData
+private class TargetType : IAdditionalColumns
 {
   //Data from "A" column loads here.
   public string A { get; set; }
