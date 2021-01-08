@@ -6,7 +6,7 @@
         {
         }
 
-        public override void Assign(T value, string csvRecord)
+        public override void Assign(T value, string headerName, string csvRecord)
         {
         }
     }

@@ -8,9 +8,10 @@ namespace Helpwiz.FastCsvReader
     /// A default implementation of <see cref="IConverterSpec"/> that deals with string, int, double, Datetime, int?, double? and DateTime?
     /// Can be modified or extended by calling <see cref="SetConverter{T}"/>.
     /// </summary>
-    public sealed class DefaultConverterSpec : IConverterSpec
+    public sealed class DefaultConverterSpec : IExtendedConverterSpec
     {
         private readonly Dictionary<Type, object> converterDictionary = new Dictionary<Type, object>();
+        private readonly Dictionary<Type, object> extendedConverterDictionary = new Dictionary<Type, object>();
 
         public DefaultConverterSpec()
         {
@@ -32,48 +33,87 @@ namespace Helpwiz.FastCsvReader
             return (Func<string, T>) ret;
         }
 
-        public DefaultConverterSpec SetConverter<T>(Func<string, T> converter)
+
+        /// <summary>
+        /// Sets the converter for a given type - The function takes the value to convert and returns the typed target value.
+        /// </summary>
+        /// <typeparam name="TTarget"></typeparam>
+        /// <param name="converter">A function taking the value string and returning the converted element of the target type <typeparamref name="TTarget"/></param>
+        /// <returns></returns>
+        public DefaultConverterSpec SetConverter<TTarget>(Func<string, TTarget> converter)
         {
-            converterDictionary[typeof(T)] = converter;
+            var tType = typeof(TTarget);
+            converterDictionary[tType] = converter;
+            if (extendedConverterDictionary.ContainsKey(tType))
+            {
+                extendedConverterDictionary.Remove(tType);
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Sets the converter for a given target type - The function takes the column name, the value to convert, and returns the typed target value.
+        /// </summary>
+        /// <typeparam name="TTarget"></typeparam>
+        /// <param name="converter">a function that takes a column name, the value to be converted, and returns an element of the target type <typeparamref name="TTarget"/></param>
+        /// <returns></returns>
+        public DefaultConverterSpec SetConverter<TTarget>(Func<string, string, TTarget> converter)
+        {
+            var tType = typeof(TTarget);
+            extendedConverterDictionary[tType] = converter;
+            if (converterDictionary.ContainsKey(tType))
+            {
+                converterDictionary.Remove(tType);
+            }
             return this;
         }
 
         internal void RegisterDefaultConverters()
         {
-            SetConverter(t => t);   //String
-            SetConverter(t =>       //Integer
+            SetConverter((c, t) => t);   //String
+            SetConverter((c, t) =>       //Integer
             {
-                if (!int.TryParse(t, out var ret)) throw new ArgumentException($"Value {t} does not parse to an integer");
+                if (!int.TryParse(t, out var ret)) throw new ArgumentException($"Value {t} in Column {c} does not parse to an integer");
                 return ret;
             });
-            SetConverter(t =>       //Double
+            SetConverter((c, t) =>       //Double
             {
-                if (!double.TryParse(t, NumberStyles.Any, CultureInfo.CurrentCulture, out var ret)) throw new ArgumentException($"Value {t} does not parse to a double");
+                if (!double.TryParse(t, NumberStyles.Any, CultureInfo.CurrentCulture, out var ret)) throw new ArgumentException($"Value {t} in Column {c} does not parse to a double");
                 return ret;
             });
-            SetConverter(t =>       //DateTime
+            SetConverter((c, t) =>       //DateTime
             {
-                if (!DateTime.TryParse(t, CultureInfo.CurrentCulture, DateTimeStyles.AssumeLocal, out var ret)) throw new ArgumentException($"Value {t} does not parse to a DateTime in the current culture");
+                if (!DateTime.TryParse(t, CultureInfo.CurrentCulture, DateTimeStyles.AssumeLocal, out var ret)) throw new ArgumentException($"Value {t} in Column {c} does not parse to a DateTime in the current culture");
                 return ret;
             });
-            SetConverter(t =>       //int?
+            SetConverter((c, t) =>       //int?
             {
                 if (string.IsNullOrWhiteSpace(t)) return (int?) null;
-                if (!int.TryParse(t, out var ret)) throw new ArgumentException($"Value {t} does not parse to an integer");
+                if (!int.TryParse(t, out var ret)) throw new ArgumentException($"Value {t} in Column {c} does not parse to an integer");
                 return ret;
             });
-            SetConverter(t =>       //double?
+            SetConverter((c, t) =>       //double?
             {
                 if (string.IsNullOrWhiteSpace(t)) return (double?)null;
-                if (!double.TryParse(t, NumberStyles.Any, CultureInfo.CurrentCulture, out var ret)) throw new ArgumentException($"Value {t} does not parse to a double");
+                if (!double.TryParse(t, NumberStyles.Any, CultureInfo.CurrentCulture, out var ret)) throw new ArgumentException($"Value {t} in Column {c} does not parse to a double");
                 return ret;
             });
-            SetConverter(t =>       //DateTime?
+            SetConverter((c, t) =>       //DateTime?
             {
                 if (string.IsNullOrWhiteSpace(t)) return (DateTime?)null;
-                if (!DateTime.TryParse(t, CultureInfo.CurrentCulture, DateTimeStyles.AssumeLocal, out var ret)) throw new ArgumentException($"Value {t} does not parse to a DateTime in the current culture");
+                if (!DateTime.TryParse(t, CultureInfo.CurrentCulture, DateTimeStyles.AssumeLocal, out var ret)) throw new ArgumentException($"Value {t} in Column {c} does not parse to a DateTime in the current culture");
                 return ret;
             });
+        }
+
+        public bool HasExtendedConverter(Type destinationType)
+        {
+            return extendedConverterDictionary.ContainsKey(destinationType);
+        }
+
+        public Func<string, string, T> GetExtendedConverter<T>()
+        {
+            return (Func<string, string, T>) extendedConverterDictionary[typeof(T)];
         }
     }
 }

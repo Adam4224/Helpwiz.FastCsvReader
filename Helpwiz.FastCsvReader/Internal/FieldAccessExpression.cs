@@ -55,7 +55,7 @@ namespace Helpwiz.FastCsvReader.Internal
             }
         }
 
-        public abstract void Assign(T value, string csvRecord);
+        public abstract void Assign(T value, string headerName, string csvRecord);
 
         public static FieldAccessExpression<T> Create(string name, IConverterSpec converterSpec)
         {
@@ -72,7 +72,9 @@ namespace Helpwiz.FastCsvReader.Internal
                 return empty;
             }
 
-            if (!converterSpec.HasConverter(member.PropertyType))
+            var extendedConverter = converterSpec as IExtendedConverterSpec;
+
+            if (!converterSpec.HasConverter(member.PropertyType) && (extendedConverter == null || !extendedConverter.HasExtendedConverter(member.PropertyType)))
             {
                 throw new ArgumentException($"Provided IConverterSpec doesn't implement conversion from string to {member.PropertyType}", nameof(converterSpec));
             }
@@ -85,11 +87,12 @@ namespace Helpwiz.FastCsvReader.Internal
     internal sealed class FieldAccessExpression<T, TProperty> : FieldAccessExpression<T>
     {
         private readonly Action<T, TProperty> assignAction;
-        private readonly Func<string, TProperty> convertAction;
+        private readonly Func<string, string, TProperty> convertAction;
 
         public FieldAccessExpression(PropertyInfo member, IConverterSpec converterSpec)
         {
-            convertAction = converterSpec.GetConverter<TProperty>();
+            var cFunc = converterSpec.HasConverter(typeof(TProperty)) ? converterSpec.GetConverter<TProperty>() : null;
+            convertAction = cFunc != null ? (c, s) => cFunc(s): ((IExtendedConverterSpec)converterSpec).GetExtendedConverter<TProperty>();
             var instance = Expression.Parameter(typeof(T), "instance");
             var propertyValue = Expression.Parameter(member.PropertyType, "propertyValue");
 
@@ -97,9 +100,9 @@ namespace Helpwiz.FastCsvReader.Internal
             assignAction = Expression.Lambda<Action<T, TProperty>>(body, instance, propertyValue).Compile();
         }
 
-        public override void Assign(T instance, string csvRecord)
+        public override void Assign(T instance, string headerName, string csvRecord)
         {
-            assignAction(instance, convertAction(csvRecord));
+            assignAction(instance, convertAction(headerName, csvRecord));
         }
     }
 }

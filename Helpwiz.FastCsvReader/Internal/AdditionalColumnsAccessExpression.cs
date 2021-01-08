@@ -12,7 +12,7 @@ namespace Helpwiz.FastCsvReader.Internal
             assignAction = (t, s) => t.WriteColumn(fieldName, s);
         }
 
-        public override void Assign(T value, string csvRecord)
+        public override void Assign(T value, string headerName, string csvRecord)
         {
             assignAction(value, csvRecord);
         }
